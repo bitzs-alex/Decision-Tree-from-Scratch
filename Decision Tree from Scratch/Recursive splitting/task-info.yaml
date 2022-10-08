@@ -88,6 +88,6 @@ files:
     if __name__ == '__main__':
         RecSplitTest().run_tests()
   learner_created: false
-feedback_link: https://hyperskill.org/projects/259/stages/1309/implement#comment
+feedback_link: https://hyperskill.org/learn/step/20211#comment
 status: Unchecked
 record: -1

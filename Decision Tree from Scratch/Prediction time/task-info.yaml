@@ -110,6 +110,6 @@ files:
     if __name__ == '__main__':
         TreePredTest().run_tests()
   learner_created: false
-feedback_link: https://hyperskill.org/projects/259/stages/1311/implement#comment
+feedback_link: https://hyperskill.org/learn/step/20213#comment
 status: Unchecked
 record: -1
