@@ -89,5 +89,8 @@ files:
         RecSplitTest().run_tests()
   learner_created: false
 feedback_link: https://hyperskill.org/learn/step/20211#comment
-status: Unchecked
+status: Solved
+feedback:
+  message: Congratulations!
+  time: Tue, 11 Oct 2022 01:55:06 UTC
 record: -1

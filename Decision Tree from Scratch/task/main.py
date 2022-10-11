@@ -1,4 +1,3 @@
-# write your code here
 import numpy as np
 import pandas as pd
 
@@ -6,127 +5,96 @@ import pandas as pd
 class GiniImpurity:
     """Gini Impurity Calculator"""
 
-    def __init__(self, df: pd.DataFrame, cat_variable: str = "Survived"):
-        """Constructor of the class
+    def gini_index(self, classes: list):
+        # calculating the categorical value counts
+        return 1 - np.sum(np.square(np.unique(classes, return_counts=True)[1] / len(classes)))
 
-        Args:
-            df (pd.DataFrame): a dataframe to calculate the Gini Impurity Value
-            cat_variable (str): a categorical variable to refer to when calculating the Gini Impurity
-        """
+    def weighted_gini_index(self, splits: list):
+        # getting the total number of elements
+        total_counts = sum(len(split) for split in splits)  # getting the total number of elements in a column
+
+        # a probability of a given value multiplied by its gini index value
+        return sum((len(classes) / total_counts) * self.gini_index(classes) for classes in splits)
+
+
+class Node:
+
+    def __init__(self):
+        self.left = None
+        self.right = None
+        self.term = False
+        self.label = None
+        self.feature = None
+        self.value = None
+
+    def set_split(self, feature, value):
+        self.feature = feature
+        self.value = value
+
+    def set_term(self, label):
+        self.term = True
+        self.label = label
+
+
+class Split:
+    def __init__(self, df: pd.DataFrame, cat_variable: str = "Survived", min_data_num: int = 1):
         self.__df = df.copy()
+        self.__features = df.loc[:, df.columns != cat_variable].columns.tolist()
         self.__cat_variable = cat_variable
+        self.__min_data_num = min_data_num
+        self.__gini_impurity = GiniImpurity()
 
-    def discard(self, col_name: str):
-        """Discarding or removing a column from the dataframe
+    def split(self, df: pd.DataFrame, classes: pd.Series):
+        split_feature, split_value, left, right, global_min_gini = None, None, [], [], 1
 
-        Args:
-            col_name (str): a column name to remove from the dataframe
-        """
-        if col_name in self.__df.columns:
-            self.__df.drop(columns=col_name, inplace=True)
+        for feature, feature_data in df[self.__features].iteritems():
+            for value in feature_data.unique():
+                left_children = feature_data[feature_data == value].index.tolist()
+                right_children = feature_data[feature_data != value].index.tolist()
+                current_gini = self.__gini_impurity.weighted_gini_index(
+                    [classes[left_children], classes[right_children]])
 
-    def gini_index(self, col_name: str, value: any):
-        """Calculate the gini index of each categorical values
+                if current_gini < global_min_gini:
+                    global_min_gini = current_gini
+                    split_feature = feature
+                    split_value = value
+                    left = left_children
+                    right = right_children
 
-        Args:
-            col_name (str): a column name to calculate the individual gini index
-            value (any): a value found in the column to calculate the individual gini index
+        return global_min_gini, split_feature, split_value, left, right
 
-        Returns:
-            Calculated gini index of a given value from specified column
-        """
-        df_filtered = self.__df[self.__df[col_name] == value]  # filtering the dataframe
-        value_counts = df_filtered[self.__cat_variable].value_counts()  # calculating the categorical values count
+    def are_all_features_equal(self, df: pd.DataFrame):
+        return all(data.nunique() == 1 for _, data in df.iteritems())
 
-        return 1 - sum(
-            np.square(value / df_filtered.shape[0]) for value in value_counts
-        )
+    def is_stopping_criterion_fulfilled(self, df: pd.DataFrame, gini_impurity: float):
+        return self.are_all_features_equal(df) or gini_impurity == 0 or df.shape[0] <= self.__min_data_num
 
-    def weighted_gini_index(self, col_name: str):
-        """Calculates the weighted gini index of a column
+    def recursive_split(self, node: Node, df: pd.DataFrame = None, classes: list = None):
+        if df is None:
+            classes = self.__df[self.__cat_variable]
+            df = self.__df[self.__features]
 
-        Args:
-            col_name (str): a column name to calculate the weighted gini index
+        if self.is_stopping_criterion_fulfilled(df, self.__gini_impurity.gini_index(classes)):
+            node.set_term(classes.value_counts().idxmax())
+        else:
+            w_gini, feature, val, left, right = self.split(df, classes)
+            node.set_split(feature, val)
+            print(f"Made split: {feature} is {val}")
 
-        Returns:
-            calculated weighted gini index of a given column
-        """
-        value_counts = self.__df[col_name].value_counts()  # counting the number of different values in a column
-        number_of_values = self.__df[col_name].count()  # getting the total number of elements in a column
+            node.left = Node()
+            self.recursive_split(node.left, df.loc[left, :], classes[left])
 
-        return sum(
-            # a probability of a given value multiplied by its gini index value
-            (value_counts[value] / number_of_values) * self.gini_index(col_name, value) for value in value_counts.index
-        )
-
-    def calculate(self, discard_col: str = None):
-        """Loop over the columns of the dataframe and calculate the gini index
-
-        Args:
-            discard_col (str, optional): if there is a column that must be dropped before calculating the gini index
-
-        Returns:
-            a tuple of minimum weighted gini index value and splitting column if a dataframe is splittable
-            if not None
-        """
-        if discard_col:
-            self.discard(discard_col)
-
-        # getting the columns to discard the categorical variable
-        columns = self.__df.columns.to_list()
-        columns.remove(self.__cat_variable)
-
-        # if the dataframe is splittable
-        # calculate the gini index, if not return None
-        if len(columns):
-            weighted_gini_values = {
-                # calculate the weighted gini index for all columns
-                col_name: self.weighted_gini_index(col_name) for col_name in columns
-            }
-
-            # find the minimum
-            values = weighted_gini_values.values()
-            minimum_gini = min(values)
-            next_splitter = list(weighted_gini_values.keys())[list(values).index(minimum_gini)]
-
-            return np.round(minimum_gini, 4), next_splitter
-
-    def split(self, discard_col: str = None):
-        """Split the dataframe after calculating the gini index
-
-        Args:
-            discard_col (str, optional): if there is a column that must be dropped before calculating the gini index
-
-        Returns:
-            a tuple of minimum weighted gini index value, splitting column name, and splits if a dataframe is splittable
-            if not None
-        """
-        if calculated_gini := self.calculate(discard_col):
-            gini_index, col_name = calculated_gini
-            value_counts = self.__df[col_name].value_counts()
-            chosen_value = value_counts.idxmax()
-
-            # splitting the dataset
-            splits = [
-                list(self.__df[self.__df[col_name] == value].index)
-                for value in value_counts.index
-            ]
-
-            # discarding the column after splitting
-            self.discard(col_name)
-
-            return gini_index, col_name, chosen_value, *splits
+            node.right = Node()
+            self.recursive_split(node.right, df.loc[right, :], classes[right])
 
 
 def runner():
     path_to_dataset = input()
     df = pd.read_csv(path_to_dataset, index_col=0)
 
-    gini_impurity = GiniImpurity(df)
-    split_result = gini_impurity.split()
-
-    if split_result:
-        print(*split_result)
+    root = Node()
+    spliter = Split(df)
+    spliter.recursive_split(root)
 
 
 if __name__ == "__main__":
