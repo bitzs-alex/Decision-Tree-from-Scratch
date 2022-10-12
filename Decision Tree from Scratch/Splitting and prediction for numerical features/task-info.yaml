@@ -149,5 +149,8 @@ files:
   visible: true
   learner_created: false
 feedback_link: https://hyperskill.org/learn/step/20216#comment
-status: Unchecked
+status: Solved
+feedback:
+  message: Congratulations!
+  time: Wed, 12 Oct 2022 02:59:33 UTC
 record: -1

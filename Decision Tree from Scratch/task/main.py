@@ -68,7 +68,7 @@ class DecisionTree:
                     left = left_children
                     right = right_children
 
-        return np.round(global_min_gini, 3), split_feature, np.round(split_value, 3), left, right
+        return global_min_gini, split_feature, split_value, left, right
 
     def are_all_features_equal(self, df: pd.DataFrame):
         return all(data.nunique() == 1 for _, data in df.iteritems())
@@ -105,42 +105,51 @@ class DecisionTree:
         self.recursive_split(self.__root_node)
 
     def recursive_prediction(self, node: Node, sample: pd.Series):
-        if node.term: return node.label
+        if node.term:
+            print("\tPredicted label:", node.label)
+            return node.label
 
-        # print(f"\tConsidering decision rule on feature {node.feature} with value {node.value}")
-        if sample[node.feature] == node.value:
+        print(f"\tConsidering decision rule on feature {node.feature} with value {node.value}")
+        if self.__df[node.feature].dtype == np.float64:
+            left_check = sample[node.feature] <= node.value
+        else:
+            left_check = sample[node.feature] == node.value
+
+        if left_check:
             return self.recursive_prediction(node.left, sample)
         else:
             return self.recursive_prediction(node.right, sample)
 
     def predict(self, df: pd.DataFrame):
-        self.__predictions = [
-            self.recursive_prediction(self.__root_node, sample) for index, sample in df.iterrows()
-        ]
+        for index, sample in df.iterrows():
+            print("Prediction for sample #", index)
+            self.__predictions = [
+                self.recursive_prediction(self.__root_node, sample)
+            ]
         return pd.Series(self.__predictions, name=self.__cat_variable)
 
 
 def runner():
-    path = input()
-    df = pd.read_csv(path, index_col=0)
-
-    root = Node()
-    features = df.iloc[:, df.columns != 'Survived'].columns.tolist()
-    check = DecisionTree(root, features=features)
-    print(*check.split(df, df["Survived"]))
-
-    # path_to_train_dataset, path_to_test_dataset = [path.strip() for path in input().split()]
-    #
-    # df_train = pd.read_csv(path_to_train_dataset, index_col=0)
-    # df_test = pd.read_csv(path_to_test_dataset, index_col=0)
+    # path = input()
+    # df = pd.read_csv(path, index_col=0)
     #
     # root = Node()
-    # decision_tree = DecisionTree(root, min_data_num=74)
-    # decision_tree.fit(df_train)
-    #
+    # features = df.iloc[:, df.columns != 'Survived'].columns.tolist()
+    # check = DecisionTree(root, features=features)
+    # print(*check.split(df, df["Survived"]))
+
+    path_to_train_dataset, path_to_test_dataset = [path.strip() for path in input().split()]
+
+    df_train = pd.read_csv(path_to_train_dataset, index_col=0)
+    df_test = pd.read_csv(path_to_test_dataset, index_col=0)
+
+    root = Node()
+    decision_tree = DecisionTree(root)
+    decision_tree.fit(df_train)
+
     # y_true = df_test["Survived"]
-    # y_pred = decision_tree.predict(df_test)
-    #
+    y_pred = decision_tree.predict(df_test.loc[:, df_test.columns != "Survived"])
+
     # tn, fp, fn, tp = confusion_matrix(y_true, y_pred).ravel()
     # print(np.round(tp / (tp + fn), 3), np.round(tn / (tn + fp), 3))
 
