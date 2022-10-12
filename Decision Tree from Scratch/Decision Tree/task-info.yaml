@@ -84,5 +84,8 @@ files:
         TreeTest().run_tests()
   learner_created: false
 feedback_link: https://hyperskill.org/learn/step/20212#comment
-status: Unchecked
-record: -1
+status: Solved
+feedback:
+  message: Congratulations!
+  time: Tue, 11 Oct 2022 02:25:11 UTC
+record: 3

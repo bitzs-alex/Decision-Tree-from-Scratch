@@ -47,12 +47,6 @@ files:
 
     print(np.round(gini(array), 2), np.round(weighted_gini(split_one, split_two), 2))
   learner_created: false
-- name: test/data_stage6_test.csv
-  visible: false
-  learner_created: false
-- name: test/data_stage6_train.csv
-  visible: false
-  learner_created: false
 - name: tests.py
   visible: false
   text: |+
@@ -91,6 +85,21 @@ files:
         Eval1Test().run_tests()
 
   learner_created: false
+- name: test/data_stage6_test.csv
+  visible: true
+  learner_created: true
+- name: test/data_stage6_train.csv
+  visible: true
+  learner_created: true
+- name: test/data_stage6_train-BitzsSpace.csv
+  visible: true
+  learner_created: true
+- name: test/data_stage6_test-BitzsSpace.csv
+  visible: true
+  learner_created: true
 feedback_link: https://hyperskill.org/learn/step/20214#comment
-status: Unchecked
-record: -1
+status: Solved
+feedback:
+  message: Congratulations!
+  time: Wed, 12 Oct 2022 01:08:00 UTC
+record: 5

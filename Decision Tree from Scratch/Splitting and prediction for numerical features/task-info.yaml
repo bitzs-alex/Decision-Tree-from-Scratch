@@ -136,6 +136,18 @@ files:
     if __name__ == '__main__':
         TreeNumTest().run_tests()
   learner_created: false
+- name: test/data_stage6_test.csv
+  visible: true
+  learner_created: false
+- name: test/data_stage6_train.csv
+  visible: true
+  learner_created: false
+- name: test/data_stage6_train-BitzsSpace.csv
+  visible: true
+  learner_created: false
+- name: test/data_stage6_test-BitzsSpace.csv
+  visible: true
+  learner_created: false
 feedback_link: https://hyperskill.org/learn/step/20216#comment
 status: Unchecked
 record: -1

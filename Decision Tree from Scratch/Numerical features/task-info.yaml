@@ -47,9 +47,6 @@ files:
 
     print(np.round(gini(array), 2), np.round(weighted_gini(split_one, split_two), 2))
   learner_created: false
-- name: test/data_stage7.csv
-  visible: false
-  learner_created: false
 - name: tests.py
   visible: false
   text: |
@@ -118,6 +115,24 @@ files:
     if __name__ == '__main__':
         SplitNumTest().run_tests()
   learner_created: false
+- name: test/data_stage6_train.csv
+  visible: true
+  learner_created: true
+- name: test/data_stage6_test.csv
+  visible: true
+  learner_created: true
+- name: test/data_stage6_train-BitzsSpace.csv
+  visible: true
+  learner_created: false
+- name: test/data_stage6_test-BitzsSpace.csv
+  visible: true
+  learner_created: false
+- name: test/data_stage7.csv
+  visible: false
+  learner_created: false
 feedback_link: https://hyperskill.org/learn/step/20215#comment
-status: Unchecked
+status: Solved
+feedback:
+  message: Congratulations!
+  time: Wed, 12 Oct 2022 02:15:12 UTC
 record: -1
