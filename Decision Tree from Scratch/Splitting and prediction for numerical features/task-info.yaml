@@ -142,15 +142,9 @@ files:
 - name: test/data_stage6_train.csv
   visible: true
   learner_created: false
-- name: test/data_stage6_train-BitzsSpace.csv
-  visible: true
-  learner_created: false
-- name: test/data_stage6_test-BitzsSpace.csv
-  visible: true
-  learner_created: false
 feedback_link: https://hyperskill.org/learn/step/20216#comment
 status: Solved
 feedback:
   message: Congratulations!
   time: Wed, 12 Oct 2022 02:59:33 UTC
-record: -1
+record: 7

@@ -31,7 +31,7 @@ stages:
   is_completed: true
 - id: 1315
   step: 20217
-  is_completed: false
+  is_completed: true
 topics:
   0:
   - title: Cartesian coordinates

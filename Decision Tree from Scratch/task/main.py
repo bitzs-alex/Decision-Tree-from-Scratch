@@ -86,7 +86,7 @@ class DecisionTree:
         else:
             w_gini, feature, val, left, right = self.split(df, classes)
             node.set_split(feature, val)
-            print(f"Made split: {feature} is {val}")
+            # print(f"Made split: {feature} is {val}")
 
             node.left = Node()
             self.recursive_split(node.left, df.loc[left, :], classes[left])
@@ -106,10 +106,10 @@ class DecisionTree:
 
     def recursive_prediction(self, node: Node, sample: pd.Series):
         if node.term:
-            print("\tPredicted label:", node.label)
+            # print("\tPredicted label:", node.label)
             return node.label
 
-        print(f"\tConsidering decision rule on feature {node.feature} with value {node.value}")
+        # print(f"\tConsidering decision rule on feature {node.feature} with value {node.value}")
         if self.__df[node.feature].dtype == np.float64:
             left_check = sample[node.feature] <= node.value
         else:
@@ -122,10 +122,9 @@ class DecisionTree:
 
     def predict(self, df: pd.DataFrame):
         for index, sample in df.iterrows():
-            print("Prediction for sample #", index)
-            self.__predictions = [
-                self.recursive_prediction(self.__root_node, sample)
-            ]
+            # print("Prediction for sample #", index)
+            self.__predictions.append(self.recursive_prediction(self.__root_node, sample))
+
         return pd.Series(self.__predictions, name=self.__cat_variable)
 
 
@@ -144,14 +143,14 @@ def runner():
     df_test = pd.read_csv(path_to_test_dataset, index_col=0)
 
     root = Node()
-    decision_tree = DecisionTree(root)
+    decision_tree = DecisionTree(root, min_data_num=74)
     decision_tree.fit(df_train)
 
-    # y_true = df_test["Survived"]
+    y_true = df_test["Survived"]
     y_pred = decision_tree.predict(df_test.loc[:, df_test.columns != "Survived"])
 
-    # tn, fp, fn, tp = confusion_matrix(y_true, y_pred).ravel()
-    # print(np.round(tp / (tp + fn), 3), np.round(tn / (tn + fp), 3))
+    tn, fp, fn, tp = confusion_matrix(y_true, y_pred).ravel()
+    print(np.round(tp / (tp + fn), 3), np.round(tn / (tn + fp), 3))
 
 
 if __name__ == "__main__":
